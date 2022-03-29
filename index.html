@@ -114,6 +114,21 @@ font-weight: bolder;
 color: black;
 font-size: 30px;
 }
+.loading {
+display:none;
+  border: 10px solid #f3f3f3; /* Light grey */
+  border-top: 10px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 
 </style>
 <title></title>
@@ -124,6 +139,7 @@ font-size: 30px;
 	</div>
 	<div class="search">
 	<center><input id="input" type="text" placeholder="   Search For A City..."><button>Search</button></center><br><br><br>
+		<center><div class="loading"></div></center>
 	</div>
 	<center><h2 id="city">Douala Today</h2></center>
 		<div class="infos">
@@ -178,7 +194,7 @@ font-size: 30px;
 			<li>SANTIAGO</li>	
 			<li>Enugu</li>
 			<li>Oka</li>
-			<li>Lagos</li>           
+			<li>Lagos</li>      
 			<li>St Petersburg</li>	 	           
 			<li>Shenyang</li>	 	           
 			<li>Calcutta</li>	 	           
@@ -260,19 +276,49 @@ font-size: 30px;
 			<li>Bertoua</li>
 			<li>Ebolowa</li>
 			<li>Garoua</li>
+			<li>Alabama</li>
+			<li>Alexander  liCity</li>
+			<li>Andalusia</li>
+			<li>Anniston</li>
+			<li>Athens</li>
+			<li>Atmore</li>
+			<li>Auburn</li>
+			<li>Bessemer</li>
+			<li>Birmingham</li>
+			<li>Chickasaw</li>
+			<li>Clanton</li>
+			<li>Cullman</li>
+			<li>Decatur</li>
+			<li>Demopolis</li>
+			<li>Dothan</li>
+			<li>Enterprise</li>
+			<li>Eufaula</li>
+			<li>Florence</li>
+			<li>Fort  liPayne</li>
+			<li>Gadsden</li>
+			<li>Greenville</li>
+			<li>Guntersville</li>
+			<li>Huntsville</li>
+			<li>Jasper</li>
+			<li>Marion</li>
+			<li>Mobile</li>
+			<li>Montgomery</li>
+			<li>Opelika</li>
+			<li>Ozark</li>
+			<li>Phenix  liCity</li>
+			<li>Prichard</li>
+			<li>Scottsboro</li>
+			<li>Selma</li>
 		</ul>
 		<p class="p"></p>
 	</div>
 	</center>
 </body>
 <script type="text/javascript">
-success = (position)=>{
-console.log(position)
+
+if (navigator.Online != true){
+alert("Please connect to the internet to continue")
 }
-failed = (err)=>{
-console.log(err)
-}
-navigator.geolocation.getCurrentPosition(success, failed);
 let name = document.getElementById("city");
 var city = document.querySelector("#input");
 var button = document.querySelector("button");
@@ -283,7 +329,8 @@ var pressure = document.querySelector(".pressure");
 var speed = document.querySelector(".speed");
 let citis = document.querySelector(".major_cities");
 let li = document.querySelectorAll("li");
-
+let loader = document.querySelector(".loading");
+var trackLoad = 0;
 city.addEventListener('keyup', ()=>{
 let key_word =document.querySelector("#input").value;
 let lis = document.querySelectorAll("li");
@@ -305,16 +352,25 @@ lis[i].style.display = "none";
 }
 )
 
+window.addEventListener('keydown', (event)=>{
+if (event.key === "Enter"){
+  getWeather(city.value);
+   loader.style.display = "block";
+   citis.style.display = "none";
+}
+})
+
 let cites = document.querySelectorAll("li");
 
 cites.forEach(function(elem) {
     elem.addEventListener("click", function() {
     citis.style.display = "none"
         var selected = elem.innerHTML;
+        loader.style.display = "block";
+        trackLoad = 1;
        getWeather(selected);
     });
 });
-
 
 
 
@@ -325,16 +381,27 @@ fetch("https://api.openweathermap.org/data/2.5/weather?q="+city_name+"&appid=8d8
  desc.innerHTML = data.weather[0].description
  name.innerHTML = data.name + "  Today";
  speed.innerHTML = data.wind.speed; 
- temp.innerHTML = data.main.temp;
+ temp.innerHTML = parseInt((data.main.temp - 273.15)) + "°";
  pressure.innerHTML = data.main.pressure;
- humidity.innerHTML = data.main.humidity;
+ humidity.innerHTML = data.main.humidity + "%";
+ loader.style.display = "none";
   })
- .catch(err =>{alert(err)}) 
+ .catch(error =>{
+ desc.innerHTML = "!!"
+ name.innerHTML =  "!!";
+ speed.innerHTML = "!!"; 
+ temp.innerHTML = "!!";
+ pressure.innerHTML = "!!";
+ humidity.innerHTML = "!!";
+ loader.style.display ="none";
+ alert("Please check your internet connection and try again or try entering a valid City/Town");
+ }) 
  }
  
  button.addEventListener('click',()=>{
  getWeather(city.value);
  citis.style.display = "none"
+ loader.style.display = "block"
  })
 
 </script>
